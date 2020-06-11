@@ -24,20 +24,38 @@ class Grid:
     }
 
     def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.grid = [ [0] * width for _ in range(height) ]
+        self._width = width
+        self._height = height
+        self._grid = [[0] * width for _ in range(height)]
+        self.gscore = [[math.inf] * width for _ in range(height)]
+        self.fscore = [[math.inf] * width for _ in range(height)]
 
     def __repr__(self):
         return "Grid({}, {})".format(self.width, self.height)
 
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    @width.setter
+    def width(self, width):
+        self._width = width
+
+    @height.setter
+    def height(self, height):
+        self._height = height
+
     def read_in_grid(self):
         try:
-            for i in range(self.height):
+            for i in range(self._height):
                 row = input().strip()
                 for j, char in enumerate(row):
                     if char in Grid.valid_terrain:
-                        self.grid[i][j] = char
+                        self._grid[i][j] = char
                     else:
                         raise Exception("Invalid terrain entered")
         except Exception as e:
@@ -45,17 +63,24 @@ class Grid:
             return None
 
     def print(self):
-        for i in range(self.height):
-            for j in range(self.width):
-                print(self.grid[i][j], end='')
+        for i in range(self._height):
+            for j in range(self._width):
+                print(self._grid[i][j], end='')
             print()
+
+    def get_adjacent_coordinates(self, x_coord, y_coord):
+        return [(xcoord-1, y_coord),
+                (xcoord+1, y_coord),
+                (x_coord, y_coord-1),
+                (x_coord, y_coord+1),
+            ]
     
     def within_bounds(self, x_coord, y_coord):
-        return (x_coord >= 0 and y_coord >= 0 and x_coord < self.width and y_coord < self.height)
+        return (x_coord >= 0 and y_coord >= 0 and x_coord < self._width and y_coord < self._height)
 
     def get_cost(self, x, y):
         if within_bounds(x,y):
-            terrain = self.grid[x][y]
+            terrain = self._grid[y][x]
             return Grid.terrain_costs[terrain]
         else:
             return -1
@@ -69,8 +94,16 @@ def manhattan_distance_heauristic():
 '''
 A star search algorithm
 '''
-def search(search_space):
-    pass
+def search(search_space, start=(0,0)):
+    already_visited_positions = {}
+    positions_to_visit = {start,}
+    
+    came_from = {}
+
+    start_x, start_y = start
+    search_space.gscore[start_x][start_y] = 0
+    
+    
 
 
 def Usage():
@@ -99,4 +132,5 @@ except Exception as e:
 search_grid = Grid(grid_width, grid_height)
 search_grid.read_in_grid()
 
+search(search_grid)
 
