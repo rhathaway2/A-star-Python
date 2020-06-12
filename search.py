@@ -26,7 +26,7 @@ class Grid:
     def __init__(self, width, height):
         self._width = width
         self._height = height
-        self._grid = [[0] * width for _ in range(height)]
+        self.grid = [[0] * width for _ in range(height)]
         self.gscore = [[math.inf] * width for _ in range(height)]
         self.fscore = [[math.inf] * width for _ in range(height)]
 
@@ -60,7 +60,7 @@ class Grid:
                 row = input().strip()
                 for j, char in enumerate(row):
                     if char in Grid.valid_terrain:
-                        self._grid[i][j] = char
+                        self.grid[i][j] = char
                     else:
                         raise Exception("Invalid terrain entered")
         except Exception as e:
@@ -70,7 +70,7 @@ class Grid:
     def print(self):
         for i in range(self._height):
             for j in range(self._width):
-                print(self._grid[i][j], end='')
+                print(self.grid[i][j], end='')
             print()
 
     def get_adjacent_coordinates(self, x_coord, y_coord):
@@ -85,7 +85,7 @@ class Grid:
 
     def get_cost(self, x, y):
         if self.within_bounds(x,y):
-            terrain = self._grid[y][x]
+            terrain = self.grid[y][x]
             return Grid.terrain_costs[terrain]
         else:
             return -1
@@ -108,7 +108,15 @@ def get_lowest_fscore_pos(search_grid, open_set):
 Prints grid with path once found
 '''
 def print_path(search_grid, found_path):
-    pass
+    pos = search_grid.goal_pos
+
+    while pos != (0,0):
+        x,y = pos
+        search_grid.grid[y][x] = 'P'
+        pos = found_path[pos]
+
+    search_grid.grid[0][0] = 'P'
+    search_grid.print()
 
 '''
 A star search algorithm
@@ -133,7 +141,11 @@ def search(search_space, start=(0,0), goal=(0,0)):
         #get position with lowest fscore from positions_to_visit
         current = get_lowest_fscore_pos(search_space, positions_to_visit)
         if current == goal:
+            print("====================")
+            search_space.print()
+            print("=====PATH FOUND=====")
             print_path(search_space, came_from)
+            print("====================")
             return True
         
         positions_to_visit.remove(current)
@@ -191,6 +203,5 @@ search_grid.read_in_grid()
 goal_pos = search_grid.goal_pos
 status = search(search_grid, start=(0,0), goal=goal_pos)
 
-print(status)
 
 
